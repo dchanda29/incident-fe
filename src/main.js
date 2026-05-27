@@ -1,6 +1,7 @@
 import "./styles.css";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "/api";
+const pseudoApiBaseUrl = import.meta.env.VITE_PSEUDO_API_BASE_URL || "/pseudo-api";
 
 const form = document.querySelector("#incident-form");
 const submitButton = document.querySelector("#submit-button");
@@ -14,6 +15,9 @@ const rootCause = document.querySelector("#root-cause");
 const services = document.querySelector("#services");
 const actionsList = document.querySelector("#actions-list");
 const evidenceList = document.querySelector("#evidence-list");
+const simulatedFailurePanel = document.querySelector("#simulated-failure-panel");
+const simulatedFailure = document.querySelector("#simulated-failure");
+const scenarioButtons = document.querySelectorAll(".scenario-button");
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -56,6 +60,35 @@ resetButton.addEventListener("click", () => {
   form.reset();
   result.classList.add("hidden");
   emptyState.classList.remove("hidden");
+  simulatedFailurePanel.classList.add("hidden");
+});
+
+scenarioButtons.forEach((button) => {
+  button.addEventListener("click", async () => {
+    const scenario = button.dataset.scenario;
+
+    setScenarioLoading(button, true);
+
+    try {
+      const response = await fetch(`${pseudoApiBaseUrl}/demo/incidents/${scenario}`, {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Scenario failed with ${response.status}`);
+      }
+
+      const demo = await response.json();
+      simulatedFailurePanel.classList.remove("hidden");
+      simulatedFailure.textContent = JSON.stringify(demo.simulated_failure, null, 2);
+      renderReport(demo.triage_report);
+    } catch (error) {
+      simulatedFailurePanel.classList.add("hidden");
+      renderError(error);
+    } finally {
+      setScenarioLoading(button, false);
+    }
+  });
 });
 
 function renderReport(report) {
@@ -105,6 +138,15 @@ function renderReport(report) {
   );
 }
 
+function setScenarioLoading(button, isLoading) {
+  if (!button.dataset.label) {
+    button.dataset.label = button.textContent;
+  }
+
+  button.disabled = isLoading;
+  button.textContent = isLoading ? "Running..." : button.dataset.label;
+}
+
 function renderError(error) {
   emptyState.classList.add("hidden");
   result.classList.remove("hidden");
@@ -116,4 +158,3 @@ function renderError(error) {
   actionsList.replaceChildren();
   evidenceList.replaceChildren();
 }
-

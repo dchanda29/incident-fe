@@ -61,12 +61,38 @@
           </form>
         </section>
 
+        <section class="panel demo-panel">
+          <div>
+            <p class="eyebrow">Live demo scenarios</p>
+            <h2>Trigger pseudo API incidents</h2>
+            <p>
+              Run a business failure in the pseudo API service, then inspect the incident report returned by the AI triage backend.
+            </p>
+          </div>
+          <div class="demo-actions">
+            <button type="button" class="secondary scenario-button" data-scenario="payment-failure">
+              Payment failure
+            </button>
+            <button type="button" class="secondary scenario-button" data-scenario="checkout-degradation">
+              Checkout degradation
+            </button>
+            <button type="button" class="secondary scenario-button" data-scenario="inventory-timeout">
+              Inventory timeout
+            </button>
+          </div>
+        </section>
+
         <section id="empty-state" class="empty-state">
           <h2>Ready for triage</h2>
           <p>Select a service, describe the failure, and run analysis to generate a root cause report.</p>
         </section>
 
         <section id="result" class="result hidden" aria-live="polite">
+          <article id="simulated-failure-panel" class="panel hidden">
+            <h3>Simulated Failure</h3>
+            <pre id="simulated-failure"></pre>
+          </article>
+
           <div class="report-header">
             <div>
               <p class="eyebrow">Triage report</p>
@@ -106,4 +132,3 @@
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
-

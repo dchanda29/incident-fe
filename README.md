@@ -41,6 +41,7 @@ http://127.0.0.1:5173/
 ```
 
 In development, Vite proxies `/api/*` to the backend at `http://127.0.0.1:8000`.
+It also proxies `/pseudo-api/*` to the pseudo business APIs at `http://127.0.0.1:8010`.
 
 ## Configure Backend URL
 
@@ -48,6 +49,7 @@ For production builds, set:
 
 ```bash
 VITE_API_BASE_URL=https://your-backend.example.com
+VITE_PSEUDO_API_BASE_URL=https://your-pseudo-apis.example.com
 ```
 
 Then build:
@@ -61,4 +63,3 @@ npm run build
 This UI is intentionally thin. The portfolio story should remain backend-led:
 
 > AI-powered incident triage system that correlates logs, metrics, deployments, and runbooks to generate structured root cause reports for production incidents.
-
