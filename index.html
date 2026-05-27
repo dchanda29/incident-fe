@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Incident Triage AI Console</title>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Incident Triage AI</p>
+            <h1>Production Incident Console</h1>
+          </div>
+          <div class="status-pill">
+            <span class="pulse"></span>
+            API ready
+          </div>
+        </header>
+
+        <section class="panel analyzer">
+          <form id="incident-form">
+            <div class="form-grid">
+              <label>
+                Service
+                <select id="service" name="service">
+                  <option value="payments-api">payments-api</option>
+                  <option value="checkout-api">checkout-api</option>
+                  <option value="orders-api">orders-api</option>
+                  <option value="inventory-api">inventory-api</option>
+                  <option value="">All services</option>
+                </select>
+              </label>
+
+              <label>
+                Severity
+                <select id="severity" name="severity">
+                  <option value="high">High</option>
+                  <option value="critical">Critical</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              Incident question
+              <textarea
+                id="question"
+                name="question"
+                rows="4"
+                required
+              >Why are payments failing after the latest deployment?</textarea>
+            </label>
+
+            <div class="actions">
+              <button type="submit" id="submit-button">Analyze Incident</button>
+              <button type="button" id="reset-button" class="secondary">Reset</button>
+            </div>
+          </form>
+        </section>
+
+        <section id="empty-state" class="empty-state">
+          <h2>Ready for triage</h2>
+          <p>Select a service, describe the failure, and run analysis to generate a root cause report.</p>
+        </section>
+
+        <section id="result" class="result hidden" aria-live="polite">
+          <div class="report-header">
+            <div>
+              <p class="eyebrow">Triage report</p>
+              <h2 id="summary">Summary</h2>
+            </div>
+            <div class="confidence">
+              <span id="confidence-value">0%</span>
+              <small>confidence</small>
+            </div>
+          </div>
+
+          <div class="report-grid">
+            <article class="panel">
+              <h3>Likely Root Cause</h3>
+              <p id="root-cause"></p>
+            </article>
+
+            <article class="panel">
+              <h3>Impacted Services</h3>
+              <div id="services" class="chips"></div>
+            </article>
+          </div>
+
+          <article class="panel">
+            <h3>Recommended Actions</h3>
+            <ol id="actions-list"></ol>
+          </article>
+
+          <article class="panel">
+            <h3>Evidence</h3>
+            <div id="evidence-list" class="evidence-list"></div>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+
