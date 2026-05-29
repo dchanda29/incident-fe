@@ -52,6 +52,8 @@ VITE_API_BASE_URL=https://your-backend.example.com
 VITE_PSEUDO_API_BASE_URL=https://your-pseudo-apis.example.com
 ```
 
+In Vercel, add these in **Project Settings -> Environment Variables**, then redeploy the latest deployment. If these are missing, the deployed app will try to call local development proxy paths like `/api`, which only work during `npm run dev`.
+
 Then build:
 
 ```bash
