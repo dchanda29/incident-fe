@@ -13,6 +13,7 @@ This is a focused operational UI for engineers to submit an incident question, c
 - Impacted services
 - Recommended remediation steps
 - Evidence from logs, metrics, deployments, and runbooks
+- Follow-up assistant for contextual incident questions
 
 ## Local Setup
 

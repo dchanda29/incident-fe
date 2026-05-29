@@ -121,6 +121,28 @@
             <ol id="actions-list"></ol>
           </article>
 
+          <article class="panel follow-up-panel">
+            <div class="follow-up-header">
+              <div>
+                <h3>Follow-up Assistant</h3>
+                <p>Ask a contextual question about this incident report.</p>
+              </div>
+            </div>
+            <div id="follow-up-thread" class="follow-up-thread"></div>
+            <form id="follow-up-form" class="follow-up-form">
+              <input
+                id="follow-up-question"
+                name="follow-up-question"
+                type="text"
+                placeholder="Should we rollback or fix forward?"
+                autocomplete="off"
+                required
+              />
+              <button type="submit" id="follow-up-button">Ask</button>
+            </form>
+            <div id="suggested-questions" class="suggested-questions"></div>
+          </article>
+
           <article class="panel">
             <h3>Evidence</h3>
             <div id="evidence-list" class="evidence-list"></div>

@@ -19,6 +19,13 @@ const evidenceList = document.querySelector("#evidence-list");
 const simulatedFailurePanel = document.querySelector("#simulated-failure-panel");
 const simulatedFailure = document.querySelector("#simulated-failure");
 const scenarioButtons = document.querySelectorAll(".scenario-button");
+const followUpForm = document.querySelector("#follow-up-form");
+const followUpQuestion = document.querySelector("#follow-up-question");
+const followUpButton = document.querySelector("#follow-up-button");
+const followUpThread = document.querySelector("#follow-up-thread");
+const suggestedQuestions = document.querySelector("#suggested-questions");
+
+let currentReport = null;
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -61,6 +68,9 @@ resetButton.addEventListener("click", () => {
   result.classList.add("hidden");
   emptyState.classList.remove("hidden");
   simulatedFailurePanel.classList.add("hidden");
+  currentReport = null;
+  followUpThread.replaceChildren();
+  suggestedQuestions.replaceChildren();
 });
 
 scenarioButtons.forEach((button) => {
@@ -89,7 +99,49 @@ scenarioButtons.forEach((button) => {
   });
 });
 
+followUpForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (!currentReport) {
+    renderError(new Error("Run an incident analysis before asking a follow-up question."));
+    return;
+  }
+
+  const question = followUpQuestion.value.trim();
+  if (!question) {
+    return;
+  }
+
+  followUpButton.disabled = true;
+  followUpButton.textContent = "Asking...";
+  appendFollowUpMessage("question", question);
+  followUpQuestion.value = "";
+
+  try {
+    const endpoint = `${apiBaseUrl}/incidents/follow-up`;
+    assertProductionApiUrl(apiBaseUrl, "VITE_API_BASE_URL");
+
+    const response = await requestJson(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question,
+        incident_report: currentReport,
+      }),
+    });
+
+    appendFollowUpMessage("answer", response.answer, response.grounded_in);
+    renderSuggestedQuestions(response.suggested_next_questions);
+  } catch (error) {
+    appendFollowUpMessage("answer error", error.message);
+  } finally {
+    followUpButton.disabled = false;
+    followUpButton.textContent = "Ask";
+  }
+});
+
 function renderReport(report) {
+  currentReport = report;
   emptyState.classList.add("hidden");
   result.classList.remove("hidden");
 
@@ -134,6 +186,13 @@ function renderReport(report) {
       return item;
     }),
   );
+
+  followUpThread.replaceChildren();
+  renderSuggestedQuestions([
+    "What should I check first?",
+    "How do I verify the root cause?",
+    "Should I rollback or fix forward?",
+  ]);
 }
 
 function setScenarioLoading(button, isLoading) {
@@ -166,6 +225,52 @@ function assertProductionApiUrl(baseUrl, envName) {
   }
 }
 
+function appendFollowUpMessage(kind, text, groundedIn = []) {
+  const message = document.createElement("section");
+  message.className = `follow-up-message ${kind.includes("question") ? "user-message" : "agent-message"}`;
+
+  const label = document.createElement("strong");
+  label.textContent = kind.includes("question") ? "You" : "Assistant";
+
+  const body = document.createElement("p");
+  body.textContent = text;
+
+  message.append(label, body);
+
+  if (groundedIn.length) {
+    const chips = document.createElement("div");
+    chips.className = "grounded-chips";
+
+    groundedIn.forEach((item) => {
+      const chip = document.createElement("span");
+      chip.className = "chip";
+      chip.textContent = item;
+      chips.append(chip);
+    });
+
+    message.append(chips);
+  }
+
+  followUpThread.append(message);
+  message.scrollIntoView({ block: "nearest" });
+}
+
+function renderSuggestedQuestions(questions) {
+  suggestedQuestions.replaceChildren(
+    ...questions.map((question) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "suggestion-button";
+      button.textContent = question;
+      button.addEventListener("click", () => {
+        followUpQuestion.value = question;
+        followUpQuestion.focus();
+      });
+      return button;
+    }),
+  );
+}
+
 function renderError(error) {
   emptyState.classList.add("hidden");
   result.classList.remove("hidden");
@@ -177,4 +282,7 @@ function renderError(error) {
   actionsList.replaceChildren();
   evidenceList.replaceChildren();
   simulatedFailurePanel.classList.add("hidden");
+  currentReport = null;
+  followUpThread.replaceChildren();
+  suggestedQuestions.replaceChildren();
 }
